@@ -40,4 +40,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	// restoring a snapshot
+	err = logic.Restore(minioClient, "snap-1752325410.json", "./restored")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Restored")
 }

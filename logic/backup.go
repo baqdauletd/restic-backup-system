@@ -75,7 +75,7 @@ func Backup(minioClient *minio.Client, sourceDir string) error {
 			found, _ := minioClient.StatObject(context.Background(), bucketChunks, chunkID, minio.StatObjectOptions{})
 			if found.Size == 0 {
 				// encrypt and compress
-				encChunk, err := encryptAndCompress(chunk)
+				encChunk, err := EncryptAndCompress(chunk)
 				if err != nil {
 					return err
 				}
@@ -127,6 +127,6 @@ func Backup(minioClient *minio.Client, sourceDir string) error {
 		return err
 	}
 
-	fmt.Println("✅ Snapshot saved as", snapName)
+	fmt.Println("Snapshot saved as", snapName)
 	return nil
 }
