@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
+	"os"
 	"restic-backup-system/logic"
 
 	"github.com/minio/minio-go/v7"
@@ -10,6 +12,11 @@ import (
 )
 
 func main() {
+	mode := flag.String("mode", "", "backup or restore")
+	backup_folder := flag.String("backup_folder", "./my-folder", "write a folder to be stored in backup (for backup mode)")
+	restore_folder := flag.String("restore_folder", "./restores", "write a folder where all the files will be restored (for restore mode)")
+	flag.Parse()
+	
 	endpoint := "localhost:9000"
 	accessKey := "miniobaga"
 	secretKey := "miniobaga"
@@ -19,8 +26,9 @@ func main() {
 		Secure: false,
 	})
 	if err != nil {
-		panic(err)
+		fmt.Println("Error starting MINIO:", err)
 	}
+
 
 	// chunks bucket
 	err = minioClient.MakeBucket(context.Background(), "chunks", minio.MakeBucketOptions{})
@@ -36,15 +44,24 @@ func main() {
 
 	fmt.Println("Buckets created or already exist")
 
-	err = logic.Backup(minioClient, "./my-folder")
-	if err != nil {
-		panic(err)
+	switch *mode{
+	case "backup":
+		//storing 
+		err = logic.Backup(minioClient, *backup_folder)
+		if err != nil {
+			panic(err)
+		}
+	case "restore":
+		// restoring a snapshot
+		err = logic.Restore(minioClient, "snap-1752325410.json", *restore_folder)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Restored")
+	default:
+		fmt.Println("Usage:")
+		fmt.Println("  ./restic-backup-system -mode=backup backup_folder=path_to_folder")
+		fmt.Println("  ./restic-backup-system -mode=restore restore_folder=path_to_folder")
+		os.Exit(1)
 	}
-
-	// restoring a snapshot
-	err = logic.Restore(minioClient, "snap-1752325410.json", "./restored")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Restored")
 }

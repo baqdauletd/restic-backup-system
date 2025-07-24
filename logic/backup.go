@@ -1,10 +1,7 @@
 package logic
 
 import (
-	// "compress/gzip"
 	"context"
-	// "crypto/aes"
-	// "crypto/cipher"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -16,7 +13,6 @@ import (
 	"time"
 
 	"github.com/minio/minio-go/v7"
-	// "github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 const (
