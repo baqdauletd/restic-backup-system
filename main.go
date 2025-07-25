@@ -14,7 +14,7 @@ import (
 func main() {
 	mode := flag.String("mode", "", "backup or restore")
 	backup_folder := flag.String("backup_folder", "./my-folder", "write a folder to be stored in backup (for backup mode)")
-	restore_folder := flag.String("restore_folder", "./restores", "write a folder where all the files will be restored (for restore mode)")
+	restore_folder := flag.String("restore_folder", "./restored", "write a folder where all the files will be restored (for restore mode)")
 	flag.Parse()
 	
 	endpoint := "localhost:9000"
@@ -53,7 +53,7 @@ func main() {
 		}
 	case "restore":
 		// restoring a snapshot
-		err = logic.Restore(minioClient, "snap-1752325410.json", *restore_folder)
+		err = logic.Restore(minioClient, "snap-1753363834.json", *restore_folder)
 		if err != nil {
 			panic(err)
 		}
@@ -65,3 +65,14 @@ func main() {
 		os.Exit(1)
 	}
 }
+
+//PLAN
+
+//save in map filename - snapshotNum
+
+//request a list of all files that are in backup and can be restored
+//request in terminal by filename and search snapshot from map and then by its num from MINIO
+
+// allow requesting several/all files for restoring
+
+// flag for restoring all files

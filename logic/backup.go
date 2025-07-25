@@ -33,16 +33,23 @@ type Snapshot struct {
 	Files     []FileEntry `json:"files"`
 }
 
+var fileNames map[string]string
+
 func Backup(minioClient *minio.Client, sourceDir string) error {
 	var snapshot Snapshot
 	snapshot.Timestamp = time.Now()
+	var relPath string
 
 	err := filepath.WalkDir(sourceDir, func(path string, d os.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
 			return err
 		}
 
-		relPath, _ := filepath.Rel(sourceDir, path)
+		relPath, err = filepath.Rel(sourceDir, path)
+		if err != nil{
+			fmt.Println("Error reading directory")
+			return err
+		}
 		fmt.Println("Backing up:", relPath)
 
 		file, err := os.Open(path)
@@ -97,6 +104,8 @@ func Backup(minioClient *minio.Client, sourceDir string) error {
 			Path:   relPath,
 			Chunks: chunks,
 		})
+
+		// fileNames[relPath] = fmt.Sprintf("snap-%d.json", time.Now().Unix())
 
 		return nil
 	})
